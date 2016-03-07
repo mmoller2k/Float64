@@ -16,7 +16,7 @@ typedef float32_t f32;
 typedef uint64_t ui64;
 typedef int64_t i64;
 
-#define STRLEN 16
+#define F64_STRLEN 16
 
 class f64 : public Printable
 {
@@ -24,7 +24,7 @@ class f64 : public Printable
   float64_t        num_;
   static char      str_[];
   static uint8_t   aft_point;
-  int8_t maxexp_;
+  //int8_t maxexp_;
 
   void init(void);
 
@@ -51,13 +51,14 @@ public:
   ~f64 ();
   
   // for outputting purposes ...
+  char * toString (void) const;  // returns default number of decimal places.
   char * toString (int) const;  // returns number as string.
   operator int () const;
   operator long () const;
   operator double () const;
   operator float32_t () const;
   operator float64_t () const;
-  void printDecs(uint8_t n); /* set no of digits after the decimal point */
+  void setDecs(uint8_t n); /* set no of digits after the decimal point */
   virtual size_t printTo(Print& p) const; // for Serial.print()
 
   // operators ... assignment

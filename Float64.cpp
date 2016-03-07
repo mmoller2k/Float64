@@ -8,9 +8,6 @@
 #include <stdlib.h>
 #include "Float64.h"
 
-char f64::str_[STRLEN];
-uint8_t f64::aft_point = STRLEN;
-
 // constructor
 f64::f64 ()
 {
@@ -160,18 +157,6 @@ f64::operator float32_t () const
 {
   return f64_to_f32(num_);
 } // end of f64::operator long
-
-// Allow Arduino's Serial.print() to print f64 objects!
-size_t f64::printTo(Print& p) const
-{
-  char *buf = toString(aft_point);
-  p.write(buf);
-}
-
-void f64::printDecs(uint8_t n)
-{
-	aft_point = n;
-}
 
 // add
 f64 & f64::operator+= (const f64 & n)

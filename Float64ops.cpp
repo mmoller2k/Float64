@@ -2,6 +2,9 @@
 #include "Float64.h"
 #include "include/internals.h"
 
+  char      f64::str_[F64_STRLEN];
+  uint8_t   f64::aft_point = 10;
+
 /* more f64 operations */
 
 // square root
@@ -74,8 +77,9 @@ static int16_t f64_epart(float64_t z, float64_t *sig)
     i++;
   }
 
-  if(sig)*sig = f64_mul(z,ten);
-  
+  if(sig){
+    *sig = f64_mul(z,ten);
+  }  
   return i-(m*16)-1;
 }
 
@@ -139,14 +143,18 @@ void f64::hi_bits(int32_t b)
 }
 
 #define expMax 12
-#define f64scale 8
+#define f64scale 10
+
+char * f64::toString(void) const
+{
+  return toString(f64scale);
+}
 
 char * f64::toString(int afterpoint) const
 {
   float64_t fpart, sig, v = num_;
   int64_t pn, ipart;
   int i = 0;
-  float64_t half;
   int16_t e,ep=0;
 
   if(f64_lt(v,i32_to_f64(0))){
@@ -166,25 +174,28 @@ char * f64::toString(int afterpoint) const
  
   // Extract floating part
   fpart = f64_sub(v, i64_to_f64(ipart));
+
+  //if(ep && i>9){ /* fix rounding errors */
+  //  i /= 10;
+  //  ep++;
+  //}
  
   // convert integer part to string
   i += intToStr(ipart, &str_[i], 1);
  
   // check for display option after point
   if (afterpoint != 0){
-    half = f64_div(i32_to_f64(1), i32_to_f64(2));
     str_[i++] = '.';  // add dot
 
-    if(i + afterpoint >= STRLEN-1)afterpoint=STRLEN-i;
+    if(i + afterpoint >= F64_STRLEN-1)afterpoint=F64_STRLEN-i;
  
     // Get the value of fraction part upto given no.
     // of points after dot. The third parameter is needed
     // to handle cases like 233.007
     pn = pow10(afterpoint);
     fpart = f64_mul( fpart, i64_to_f64(pn) );
-    fpart = f64_add( fpart, half );
  
-    i += intToStr(f64_to_i64(fpart, softfloat_round_minMag, 0), str_ + i, afterpoint);
+    i += intToStr(f64_to_i64(fpart, softfloat_round_min, 0), str_ + i, afterpoint);
   }
 
   if(ep){
@@ -197,6 +208,13 @@ char * f64::toString(int afterpoint) const
   }
   
   return str_;
+}
+
+// Allow Arduino's Serial.print() to print f64 objects!
+size_t f64::printTo(Print& p) const
+{
+  char *buf = toString(aft_point);
+  p.write(buf);
 }
 
 f64 f64::NaN(void)
@@ -220,6 +238,7 @@ f64 strtof64(const char *nptr, char **endptr)
   bool sexp = false;
   const float64_t ten = i32_to_f64(10);
   const float64_t large = i64_to_f64(10000000000000000);
+  const float64_t small = f64_div(i32_to_f64(1), i64_to_f64(100000000000000));
 
   for(i=0;c&&!stop;i++){
     c=nptr[i];
@@ -261,6 +280,9 @@ f64 strtof64(const char *nptr, char **endptr)
       break;
     }
   }
+
+  d = f64_add(d, small); /* force rounding upward */
+  /* make .99999999999999 = 1.0 */
 
   if(sexp) while(e>=16){ d=f64_div(d,large); e-=16;}
   else while(e>=16){ d=f64_mul(d,large);e-=16;}
