@@ -8,35 +8,38 @@
 /* more f64 operations */
 
 // square root
-f64 f64::sqrt () const
+f64 f64::sqrt (void) const
 {
   f64 result = 0.0;
   result = f64_sqrt (num_);
   return result;
 } // end of f64::sqrt
 
-f64 f64::fabs () const
+f64 f64::fabs (void) const
 {
   f64 result = *this;
   if( f64_lt(num_,i32_to_f64(0)) )result = f64_mul(num_,i32_to_f64(-1));
   return result;
 }
 
-f64 f64::floor() const
+f64 f64::floor(void) const
 {
   f64 result;
   result = f64_roundToInt( num_, softfloat_round_min, 0 );
   return result;
 }
 
+f64 f64::intval(void) const
+{
+  f64 result;
+  result = f64_roundToInt( num_, softfloat_round_minMag, 0 );
+  return result;
+}
+
+
 void f64::setDecs(uint8_t n)
 {
   aft_point = n;
-}
-
-int32_t f64::ipart() const
-{
-  return f64_to_i32(num_,softfloat_round_minMag, 0);
 }
 
 int16_t f64::epart(void) const
@@ -326,4 +329,5 @@ f64 atof64(const char *str)
   float64_t result = strtof64(str, NULL);
   return result;
 }
+
 

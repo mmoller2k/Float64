@@ -121,7 +121,7 @@ public:
   // quick zero test
   bool isZero (void) const;
   // integer part
-  int32_t ipart (void) const;
+  int32_t ipart (void) const; //only for quick 32-bit conversion
   int16_t epart (void) const;
   int16_t epart (float64_t *) const;
   //float64_t s_f64(void);
@@ -130,6 +130,7 @@ public:
   f64 sqrt (void) const;
   f64 fabs (void) const;
   f64 floor (void) const;
+  f64 intval (void) const;
   f64 NaN(void);
   //f64 pow (const f64 power) const;
   // divide number by divisor, give quotient and remainder
