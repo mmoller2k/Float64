@@ -29,6 +29,11 @@ f64 f64::floor() const
   return result;
 }
 
+void f64::setDecs(uint8_t n)
+{
+  aft_point = n;
+}
+
 int32_t f64::ipart() const
 {
   return f64_to_i32(num_,softfloat_round_minMag, 0);
@@ -158,7 +163,7 @@ static float64_t bintof(uint64_t u)
 #define expMax 12
 #define f64scale 10
 
-#define small bintof(0x3cf6849b86a12b58) //smaller than display size: 5e-15
+//#define small bintof(0x3cf6849b86a12b58) //smaller than display size: 5e-15
 #define ten bintof(0x4024000000000004) //10
 #define large bintof(0x4341c37937e08000) //1e0^16
 
@@ -170,6 +175,7 @@ char * f64::toString(void) const
 char * f64::toString(int afterpoint) const
 {
   float64_t fpart, sig, v = num_;
+  float64_t small;
   int64_t pn, ipart, ip0;
   int i = 0;
   int16_t e,ep=0;
@@ -186,8 +192,11 @@ char * f64::toString(int afterpoint) const
     ep=e;
   }
 
-    
+
+  small=f64_div( i32_to_f64(5),i64_to_f64(pow10(afterpoint+1)) );    
   v = f64_add(v, small); /* force rounding upward */
+  /* (make .99999999999999 = 1.0) */
+
   // Extract integer part
   ipart = f64_to_i64(v, softfloat_round_minMag, 0);
  
@@ -297,8 +306,7 @@ f64 strtof64(const char *nptr, char **endptr)
     }
   }
 
-  d = f64_add(d, small); /* force rounding upward */
-  /* make .99999999999999 = 1.0 */
+  //d = f64_add(d, small); /* force rounding upward */
 
   if(sexp) while(e>=16){ d=f64_div(d,large); e-=16;}
   else while(e>=16){ d=f64_mul(d,large);e-=16;}
