@@ -124,12 +124,17 @@ i64 pow10(int n)
   return pn;
 }
 
-int64_t f64::get_bits(void) const
+uint32_t f64::bits(int n) const
 {
-  int64_t *result = (int64_t *)&num_;
-  return *result;
+  return *(((uint32_t *)&num_)+n);
 }
 
+uint64_t f64::bits(void) const
+{
+  return *(int64_t *)&num_;
+}
+
+/*
 void f64::lo_bits(int32_t b)
 {
 	uint32_t *i = (uint32_t *)&num_;
@@ -141,9 +146,21 @@ void f64::hi_bits(int32_t b)
 	uint32_t *i = (uint32_t *)&num_;
 	i[1] = b;
 }
+*/
+
+static float64_t bintof(uint64_t u)
+{
+  float64_t f;
+  f.v = u;
+  return f;
+}
 
 #define expMax 12
 #define f64scale 10
+
+#define small bintof(0x3cf6849b86a12b58) //smaller than display size: 5e-15
+#define ten bintof(0x4024000000000004) //10
+#define large bintof(0x4341c37937e08000) //1e0^16
 
 char * f64::toString(void) const
 {
@@ -153,7 +170,7 @@ char * f64::toString(void) const
 char * f64::toString(int afterpoint) const
 {
   float64_t fpart, sig, v = num_;
-  int64_t pn, ipart;
+  int64_t pn, ipart, ip0;
   int i = 0;
   int16_t e,ep=0;
 
@@ -168,17 +185,19 @@ char * f64::toString(int afterpoint) const
     afterpoint = f64scale;
     ep=e;
   }
+
     
+  v = f64_add(v, small); /* force rounding upward */
   // Extract integer part
   ipart = f64_to_i64(v, softfloat_round_minMag, 0);
  
   // Extract floating part
   fpart = f64_sub(v, i64_to_f64(ipart));
 
-  //if(ep && i>9){ /* fix rounding errors */
-  //  i /= 10;
-  //  ep++;
-  //}
+  if(ep && ipart>9){ /* fix rounding errors */
+    ipart /= 10;
+    ep++;
+  }
  
   // convert integer part to string
   i += intToStr(ipart, &str_[i], 1);
@@ -236,9 +255,6 @@ f64 strtof64(const char *nptr, char **endptr)
   bool neg = false;
   int8_t nexp = 0;
   bool sexp = false;
-  const float64_t ten = i32_to_f64(10);
-  const float64_t large = i64_to_f64(10000000000000000);
-  const float64_t small = f64_div(i32_to_f64(1), i64_to_f64(100000000000000));
 
   for(i=0;c&&!stop;i++){
     c=nptr[i];

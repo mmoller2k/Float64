@@ -85,8 +85,10 @@ f64::f64 (const uint64_t n)  // constructor from uint64_t
 f64::f64 (const uint32_t hi, const uint32_t lo)  // constructor from two uint32_t
 {
   init();
-  hi_bits(hi);
-  lo_bits(lo);
+  *(uint32_t *)&num_ = lo;
+  *(((uint32_t *)&num_)+1) = hi;
+  //hi_bits(hi);
+  //lo_bits(lo);
 } // end of constructor from int
 
 // copy constructor

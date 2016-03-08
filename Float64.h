@@ -43,9 +43,10 @@ public:
   // copy constructor
   f64 (const f64 & rhs);
 
-  int64_t get_bits() const;
-  void lo_bits(int32_t b);
-  void hi_bits(int32_t b);
+  uint32_t bits(int n) const;
+  uint64_t bits() const;
+  //void lo_bits(int32_t b);
+  //void hi_bits(int32_t b);
  
   // destructor  
   ~f64 ();
