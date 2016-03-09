@@ -10,7 +10,7 @@
 // square root
 f64 f64::sqrt (void) const
 {
-  f64 result = 0.0;
+  f64 result = f64(0);
   result = f64_sqrt (num_);
   return result;
 } // end of f64::sqrt

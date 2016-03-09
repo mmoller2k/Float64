@@ -30,9 +30,9 @@ class f64 : public Printable
 
 public:
   f64 ();  // default constructor
-  f64 (const float32_t f);   // constructor from float
+  //f64 (const float32_t f);   // constructor from float
   f64 (const float64_t f);  // constructor from float64_t
-  f64 (const double f);   // constructor from double
+  //f64 (const double f);   // constructor from double
   f64 (const int n);  // constructor from int
   f64 (const long n);  // constructor from int
   //f64 (const int32_t n);  // constructor from int32_t
@@ -56,8 +56,8 @@ public:
   char * toString (int) const;  // returns number as string.
   operator int () const;
   operator long () const;
-  operator double () const;
-  operator float32_t () const;
+  //operator double () const;
+  //operator float32_t () const;
   operator float64_t () const;
   void setDecs(uint8_t n); /* set no of digits after the decimal point */
   virtual size_t printTo(Print& p) const; // for Serial.print()
@@ -75,19 +75,19 @@ public:
 
   // operations on the number which do not change it (eg. a = b + 5; )
   f64 operator+ (const f64 & n) const { f64 temp = *this; temp += n; return temp; };
-  f64 operator+ (const double & n) const { f64 temp = *this; temp += f64(n); return temp; };
+  //f64 operator+ (const double & n) const { f64 temp = *this; temp += f64(n); return temp; };
   f64 operator- (const f64 & n) const { f64 temp = *this; temp -= n; return temp; };
-  f64 operator- (const double & n) const { f64 temp = *this; temp -= f64(n); return temp; };
+  //f64 operator- (const double & n) const { f64 temp = *this; temp -= f64(n); return temp; };
   f64 operator/ (const f64 & n) const { f64 temp = *this; temp /= n; return temp; };
-  f64 operator/ (const double & n) const { f64 temp = *this; temp /= f64(n); return temp; };
+  //f64 operator/ (const double & n) const { f64 temp = *this; temp /= f64(n); return temp; };
   f64 operator* (const f64 & n) const { f64 temp = *this; temp *= n; return temp; };
-  f64 operator* (const double & n) const { f64 temp = *this; temp *= f64(n); return temp; };
+  //f64 operator* (const double & n) const { f64 temp = *this; temp *= f64(n); return temp; };
   f64 operator% (const f64 & n) const { f64 temp = *this; temp %= n; return temp; };
-  f64 operator% (const double & n) const { f64 temp = *this; temp %= f64(n); return temp; };
+  //f64 operator% (const double & n) const { f64 temp = *this; temp %= f64(n); return temp; };
   
   // prefix operations
-  f64 & operator++ () { *this += 1.0; return *this; }
-  f64 & operator-- () { *this -= 1.0; return *this; }
+  f64 & operator++ () { *this += f64(1); return *this; }
+  f64 & operator-- () { *this -= f64(1); return *this; }
   f64 & operator- () { *this *= f64(-1); return *this; }
   
   // postfix operations (cannot return by reference)
@@ -99,22 +99,22 @@ public:
   // comparisons
   bool operator<  (const f64 & rhs) const;
   bool operator<  (const int rhs) const { return *this < f64 (rhs); }
-  bool operator<  (const double rhs) const { return *this < f64 (rhs); }
+  //bool operator<  (const double rhs) const { return *this < f64 (rhs); }
   bool operator>  (const f64 & rhs) const;
   bool operator>  (const int rhs) const { return *this > f64 (rhs); }
-  bool operator>  (const double rhs) const { return *this > f64 (rhs); }
+  //bool operator>  (const double rhs) const { return *this > f64 (rhs); }
   bool operator<= (const f64 & rhs) const;
   bool operator<= (const int rhs) const { return *this <= f64 (rhs); }
-  bool operator<= (const double rhs) const { return *this <= f64 (rhs); }
+  //bool operator<= (const double rhs) const { return *this <= f64 (rhs); }
   bool operator>= (const f64 & rhs) const;
   bool operator>= (const int rhs) const { return *this >= f64 (rhs); }
-  bool operator>= (const double rhs) const { return *this >= f64 (rhs); }
+  //bool operator>= (const double rhs) const { return *this >= f64 (rhs); }
   bool operator!= (const f64 & rhs) const;
   bool operator!= (const int rhs) const { return *this != f64 (rhs); }
-  bool operator!= (const double rhs) const { return *this != f64 (rhs); }
+  //bool operator!= (const double rhs) const { return *this != f64 (rhs); }
   bool operator== (const f64 & rhs) const;
   bool operator== (const int rhs) const { return *this == f64 (rhs); }
-  bool operator== (const double rhs) const { return *this == f64 (rhs); }
+  //bool operator== (const double rhs) const { return *this == f64 (rhs); }
 
   // quick sign test
   bool isNegative (void) const;

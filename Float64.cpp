@@ -15,6 +15,7 @@ f64::f64 ()
   num_ = i32_to_f64(0); // default to zero
 } // end of constructor from NULL
 
+/*
 // constructor
 f64::f64 (float32_t f)
 {
@@ -22,14 +23,9 @@ f64::f64 (float32_t f)
   num_ = f32_to_f64(f);
 } // end of constructor from float
 
-f64::f64 (float64_t f)
-{
-  init();
-  num_ = f;
-} // end of constructor from float
-
 // constructor
 // doubles are 32-bit floats on Arduino
+
 f64::f64 (double f)
 {
   float32_t *fp = (float32_t *)&f;
@@ -41,6 +37,13 @@ f64::f64 (double f)
     num_ = *(float64_t*)&f;
   }
 } // end of constructor from double
+*/
+
+f64::f64 (float64_t f)
+{
+  init();
+  num_ = f;
+} // end of constructor from float
 
 f64::f64 (const int n)  // constructor from int
 {
@@ -143,19 +146,21 @@ f64::operator long () const
   return f64_to_i32(num_, softfloat_round_max, 0);
 } // end of f64::operator long
 
+/*
 f64::operator double () const
 {
   return *(double*)&num_;
 }
 
-f64::operator float64_t () const
-{
-  return num_;
-} // end of f64::operator long
-
 f64::operator float32_t () const
 {
   return f64_to_f32(num_);
+} // end of f64::operator long
+
+*/
+f64::operator float64_t () const
+{
+  return num_;
 } // end of f64::operator long
 
 // add
