@@ -166,45 +166,35 @@ f64::operator float64_t () const
 // add
 f64 & f64::operator+= (const f64 & n)
 { 
-  float64_t result = i32_to_f64(0);
-  result = f64_add (num_, n.num_);
-  num_ = result;
+  num_ = f64_add (num_, n.num_);
   return *this; 
 } // end of f64::operator+= 
 
 // subtract
 f64 & f64::operator-= (const f64 & n)
 { 
-  float64_t result = i32_to_f64(0);
-  result = f64_sub (num_, n.num_);
-  num_ = result;
+  num_ = f64_sub (num_, n.num_);
   return *this; 
 }  // end of f64::operator-=
 
 // divide
 f64 & f64::operator/= (const f64 & n)
 { 
-  float64_t result = i32_to_f64(0);
-  result = f64_div (num_, n.num_);
-  num_ = result;
+  num_ = f64_div (num_, n.num_);
   return *this; 
 } // end of f64::operator/= 
 
 // multiply
 f64 & f64::operator*= (const f64 & n)
 { 
-  float64_t result = i32_to_f64(0);
-  result = f64_mul (num_, n.num_);
-  num_ = result;
+  num_ = f64_mul (num_, n.num_);
   return *this; 
 }  // end of f64::operator*=
 
 // modulo
 f64 & f64::operator%= (const f64 & n)
 { 
-  float64_t result = i32_to_f64(0);
-  result = f64_rem (num_, n.num_);
-  num_ = result;
+  num_ = f64_rem (num_, n.num_);
   return *this; 
 }  // end of f64::operator%=
 

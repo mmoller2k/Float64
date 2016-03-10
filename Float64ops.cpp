@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "Float64.h"
 #include "include/internals.h"
 
@@ -10,9 +11,7 @@
 // square root
 f64 f64::sqrt (void) const
 {
-  f64 result = f64(0);
-  result = f64_sqrt (num_);
-  return result;
+  return f64_sqrt (num_);
 } // end of f64::sqrt
 
 f64 f64::fabs (void) const
@@ -24,16 +23,12 @@ f64 f64::fabs (void) const
 
 f64 f64::floor(void) const
 {
-  f64 result;
-  result = f64_roundToInt( num_, softfloat_round_min, 0 );
-  return result;
+  return f64_roundToInt( num_, softfloat_round_min, 0 );
 }
 
 f64 f64::intval(void) const
 {
-  f64 result;
-  result = f64_roundToInt( num_, softfloat_round_minMag, 0 );
-  return result;
+  return f64_roundToInt( num_, softfloat_round_minMag, 0 );
 }
 
 
@@ -64,16 +59,19 @@ static int16_t f64_epart(float64_t z, float64_t *sig)
   const float64_t big = i64_to_f64(10000000000000000);
   //big = f64_mul(big,i64_to_f64(100000000)); //bigger
   if(!e)return 0;
+  if(z.v==0x7ff0000000000000)return 0; //z==inf?
 
   //limit range
   if(e<1023){
     while((e=expF64UI(z.v))<1023){ // multiply number bigger 
+      if(softfloat_exceptionFlags>1)return 0;
       z = f64_mul(z,big);
       m++;
     }
   }
   else{
     while(!f64_lt(z,big)){
+      if(softfloat_exceptionFlags>1)return 0;
       z = f64_div(z,big);
       m--;
     }
@@ -81,6 +79,7 @@ static int16_t f64_epart(float64_t z, float64_t *sig)
 
   //(0<z<big)
   while((e=expF64UI(z.v))>=1023){
+    if(softfloat_exceptionFlags>1)return 0;
     z = f64_div(z,ten);
     i++;
   }
@@ -189,6 +188,24 @@ char * f64::toString(int afterpoint) const
   }
 
   e=f64_epart(v,&sig);
+
+  if(isNaN()){
+    strcpy(str_,"NaN");
+    softfloat_exceptionFlags=0;
+    return str_;
+  }
+  if(isInf()){
+    strcpy(str_,"Inf");
+    softfloat_exceptionFlags=0;
+    return str_;
+  }
+  if(softfloat_exceptionFlags>1){
+    //printf("Exception: %x\n", softfloat_exceptionFlags);
+    strcpy(str_,"Err");
+    softfloat_exceptionFlags=0;
+    return str_;
+  }
+
   if(e>expMax || e<-expMax){
     v = sig;
     afterpoint = f64scale;
@@ -212,7 +229,7 @@ char * f64::toString(int afterpoint) const
   }
  
   // convert integer part to string
-  i += intToStr(ipart, &str_[i], 1);
+  i += intToStr(ipart, str_+i, 1);
  
   // check for display option after point
   if (afterpoint != 0){
@@ -248,11 +265,23 @@ size_t f64::printTo(Print& p) const
   p.write(buf);
 }
 
-f64 f64::NaN(void)
+f64 f64::setNaN(void)
 {
-  float64_t z = {defaultNaNF64UI};
-  return z;
+  num_.v |= 0x7ff8000000000000;
+  return num_;
 }
+
+bool f64::isNaN(void) const
+{
+  //return f64_isSignalingNaN(num_);
+  return isNaNF64UI(num_.v);
+}
+
+bool f64::isInf(void) const
+{
+  return (num_.v)==0x7ff0000000000000;
+}
+
 
 /* minimal strtod - no validation checking */
 f64 strtof64(const char *nptr, char **endptr)
