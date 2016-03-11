@@ -195,10 +195,10 @@ char * f64::toString(int afterpoint) const
     strcpy(str_+i,"Inf");
     return str_;
   }
-  //if(softfloat_exceptionFlags>1){
-  if(expF64UI(num_.v)==0x7ff){
-    strcpy(str_,"Err");
-    //softfloat_exceptionFlags=0;
+  if(expF64UI(num_.v)==0x7ff){ // unspecified error
+    strcpy(str_,"Err ");
+    intToStr(softfloat_exceptionFlags,str_+4,0);
+    softfloat_exceptionFlags=0;
     return str_;
   }
   e=f64_epart(v,&sig);
