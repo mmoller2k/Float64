@@ -134,6 +134,7 @@ public:
   f64 setNaN(void);
   bool isNaN(void) const;
   bool isInf(void) const;
+  bool isNum(void) const;
   //f64 pow (const f64 power) const;
   // divide number by divisor, give quotient and remainder
   //void divMod (const f64 divisor, f64 & quotient, f64 & remainder) const;

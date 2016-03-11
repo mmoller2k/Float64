@@ -58,8 +58,8 @@ static int16_t f64_epart(float64_t z, float64_t *sig)
   const float64_t ten = i32_to_f64(10);
   const float64_t big = i64_to_f64(10000000000000000);
   //big = f64_mul(big,i64_to_f64(100000000)); //bigger
-  if(!e)return 0;
-  if(z.v==0x7ff0000000000000)return 0; //z==inf?
+  if(e==0)return 0;
+  if(e==0x7ff)return 0; //z==inf?
 
   //limit range
   if(e<1023){
@@ -182,29 +182,26 @@ char * f64::toString(int afterpoint) const
   int i = 0;
   int16_t e,ep=0;
 
-  if(f64_lt(v,i32_to_f64(0))){
+  //if(f64_lt(v,i32_to_f64(0))){
+  if(signF64UI(num_.v)){
     v=f64_mul(v,i32_to_f64(-1));
     str_[i++] = '-';
   }
-
-  e=f64_epart(v,&sig);
-
   if(isNaN()){
     strcpy(str_,"NaN");
-    softfloat_exceptionFlags=0;
     return str_;
   }
   if(isInf()){
-    strcpy(str_,"Inf");
-    softfloat_exceptionFlags=0;
+    strcpy(str_+i,"Inf");
     return str_;
   }
-  if(softfloat_exceptionFlags>1){
-    //printf("Exception: %x\n", softfloat_exceptionFlags);
+  //if(softfloat_exceptionFlags>1){
+  if(expF64UI(num_.v)==0x7ff){
     strcpy(str_,"Err");
-    softfloat_exceptionFlags=0;
+    //softfloat_exceptionFlags=0;
     return str_;
   }
+  e=f64_epart(v,&sig);
 
   if(e>expMax || e<-expMax){
     v = sig;
@@ -267,21 +264,26 @@ size_t f64::printTo(Print& p) const
 
 f64 f64::setNaN(void)
 {
-  num_.v |= 0x7ff8000000000000;
-  return num_;
+  num_.v = defaultNaNF64UI;
+  return *this;
 }
 
 bool f64::isNaN(void) const
 {
   //return f64_isSignalingNaN(num_);
-  return isNaNF64UI(num_.v);
+  //return softfloat_isSigNaNF64UI(num_.v);
+  return isNaNF64UI(num_.v); //why doesn't the two above work?
 }
 
 bool f64::isInf(void) const
 {
-  return (num_.v)==0x7ff0000000000000;
+  return !fracF64UI(num_.v) && (expF64UI(num_.v)==0x7ff);
 }
 
+bool f64::isNum(void) const
+{
+  return expF64UI(num_.v)!=0x7ff;
+}
 
 /* minimal strtod - no validation checking */
 f64 strtof64(const char *nptr, char **endptr)
