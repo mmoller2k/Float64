@@ -3,6 +3,8 @@
 #include "Float64.h"
 #include "include/internals.h"
 
+#define obase 10
+
   char      f64::str_[F64_STRLEN];
   uint8_t   f64::aft_point = 10;
 
@@ -44,19 +46,19 @@ int16_t f64::epart(void) const
 
 int16_t f64::epart(float64_t *sig) const
 {
-  return f64_epart(num_, sig);
+  return f64_epart(num_, sig,obase);
 }
 
-/* return base10 exponent and the significand */
-static int16_t f64_epart(float64_t z, float64_t *sig)
+/* return base_x exponent and the significand */
+static int16_t f64_epart(float64_t z, float64_t *sig, int8_t base)
 {
   int16_t e = expF64UI(z.v);
   int16_t i=0;
   int16_t m=0;
 
-  const float64_t one = i32_to_f64(1);
-  const float64_t ten = i32_to_f64(10);
-  const float64_t big = i64_to_f64(10000000000000000);
+  //const float64_t one = i32_to_f64(1);
+  const float64_t bn = i32_to_f64(base);
+  const float64_t big = i64_to_f64(powbase(16,base));
   //big = f64_mul(big,i64_to_f64(100000000)); //bigger
   if(e==0)return 0;
   if(e==0x7ff)return 0; //z==inf?
@@ -80,12 +82,12 @@ static int16_t f64_epart(float64_t z, float64_t *sig)
   //(0<z<big)
   while((e=expF64UI(z.v))>=1023){
     if(softfloat_exceptionFlags>1)return 0;
-    z = f64_div(z,ten);
+    z = f64_div(z,bn);
     i++;
   }
 
   if(sig){
-    *sig = f64_mul(z,ten);
+    *sig = f64_mul(z,bn);
   }  
   return i-(m*16)-1;
 }
@@ -103,13 +105,15 @@ static void reverse(char *str, int len)
     }
 }
  
-static int intToStr(i64 x, char str[], int d)
+static int intToStr(i64 x, char str[], int8_t d, int8_t base)
 {
-    int i = 0;
+    int8_t ch, i = 0;
     while (x)
     {
-        str[i++] = (x%10) + '0';
-        x = x/10;
+        ch = (x%base) + '0';
+        if(ch>'9')ch+='A'-':';
+        str[i++] = ch;
+        x = x/base;
     }
  
     // If number of digits required is more, then
@@ -123,11 +127,11 @@ static int intToStr(i64 x, char str[], int d)
 }
 
 // return 10^n
-i64 pow10(int n)
+i64 powbase(int n, int8_t base)
 {
   int i;
   i64 pn=1;
-  for(i=0;i<n;i++)pn*=10;
+  for(i=0;i<n;i++)pn*=base;
   return pn;
 }
 
@@ -197,11 +201,11 @@ char * f64::toString(int afterpoint) const
   }
   if(expF64UI(num_.v)==0x7ff){ // unspecified error
     strcpy(str_,"Err ");
-    intToStr(softfloat_exceptionFlags,str_+4,0);
+    intToStr(softfloat_exceptionFlags,str_+4,0,10);
     softfloat_exceptionFlags=0;
     return str_;
   }
-  e=f64_epart(v,&sig);
+  e=f64_epart(v,&sig,obase);
 
   if(e>expMax || e<-expMax){
     v = sig;
@@ -210,7 +214,7 @@ char * f64::toString(int afterpoint) const
   }
 
 
-  small=f64_div( i32_to_f64(5),i64_to_f64(pow10(afterpoint+1)) );    
+  small=f64_div( i32_to_f64(obase/2),i64_to_f64(powbase(afterpoint+1,obase)) );    
   v = f64_add(v, small); /* force rounding upward */
   /* (make .99999999999999 = 1.0) */
 
@@ -226,7 +230,7 @@ char * f64::toString(int afterpoint) const
   }
  
   // convert integer part to string
-  i += intToStr(ipart, str_+i, 1);
+  i += intToStr(ipart, str_+i, 1,obase);
  
   // check for display option after point
   if (afterpoint != 0){
@@ -237,10 +241,10 @@ char * f64::toString(int afterpoint) const
     // Get the value of fraction part upto given no.
     // of points after dot. The third parameter is needed
     // to handle cases like 233.007
-    pn = pow10(afterpoint);
+    pn = powbase(afterpoint,obase);
     fpart = f64_mul( fpart, i64_to_f64(pn) );
  
-    i += intToStr(f64_to_i64(fpart, softfloat_round_min, 0), str_ + i, afterpoint);
+    i += intToStr(f64_to_i64(fpart, softfloat_round_min, 0), str_ + i, afterpoint,obase);
   }
 
   if(ep){
@@ -249,7 +253,7 @@ char * f64::toString(int afterpoint) const
       str_[i++]='-';
       ep=-ep;
     }
-    intToStr(ep, str_ + i, 0);
+    intToStr(ep, str_ + i, 0,obase);
   }
   
   return str_;

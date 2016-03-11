@@ -143,10 +143,10 @@ public:
   
 };  // end class declaration
 
-i64 pow10(int n);
+i64 powbase(int n, int8_t base);
 f64 strtof64(const char *nptr, char **endptr);
 f64 atof64(const char *str);
-static int16_t f64_epart(float64_t z, float64_t *sig);
+static int16_t f64_epart(float64_t z, float64_t *sig, int8_t base);
 
 #endif
 
