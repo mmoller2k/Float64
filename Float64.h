@@ -24,7 +24,8 @@ class f64 : public Printable
   // member variable (the number)
   float64_t        num_;
   static char      str_[];
-  static uint8_t   aft_point;
+  static int8_t   aft_point;
+  static int8_t   obase;
   //int8_t maxexp_;
 
   void init(void);
@@ -60,7 +61,8 @@ public:
   //operator double () const;
   //operator float32_t () const;
   operator float64_t () const;
-  void setDecs(uint8_t n); /* set no of digits after the decimal point */
+  void setDecs(int8_t n); /* set no of digits after the decimal point */
+  void setBase(int8_t n); /* arbitrary base selection */
   virtual size_t printTo(Print& p) const; // for Serial.print()
 
   // operators ... assignment

@@ -2,10 +2,11 @@
 #include <string.h>
 #include "Float64.h"
 
-#define obase 10
+//#define obase 10
 
   char      f64::str_[F64_STRLEN];
-  uint8_t   f64::aft_point = 10;
+  int8_t   f64::aft_point = 10;
+  int8_t   f64::obase = 10;
 
 /* more f64 operations */
 
@@ -33,9 +34,14 @@ f64 f64::intval(void) const
 }
 
 
-void f64::setDecs(uint8_t n)
+void f64::setDecs(int8_t n)
 {
   aft_point = n;
+}
+
+void f64::setBase(int8_t n)
+{
+  obase = n;
 }
 
 /*
