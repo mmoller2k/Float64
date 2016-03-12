@@ -207,16 +207,17 @@ bool f64::operator< (const f64 & rhs) const
   return f64_lt(num_, rhs.num_);
 } // end of f64::operator<
 
-
 // compare greater with another f64
 bool f64::operator> (const f64 & rhs) const
 {
+  //return !f64_le(num_, rhs.num_); //too big
   return !(f64_lt(num_, rhs.num_) || f64_eq(num_, rhs.num_));
 } // end of f64::operator>
 
 // compare less-or-equal with another f64
 bool f64::operator<= (const f64 & rhs) const
 {
+  //return f64_le(num_, rhs.num_); //too big
   return f64_lt(num_, rhs.num_) || f64_eq(num_, rhs.num_);
 } // end of f64::operator<=
 
@@ -241,13 +242,16 @@ bool f64::operator== (const f64 & rhs) const
 // special comparisons
 bool f64::isNegative () const
 {
-  return f64_lt(num_,i32_to_f64(0));
+  //return f64_lt(num_,i32_to_f64(0));
+  return signF64UI(num_.v);
 } // end of f64::isNegative
 
+/*
 bool f64::isZero () const
 {
   return f64_eq(num_,i32_to_f64(0));
 } // end of f64::isZero
+*/
 
 int32_t f64::ipart() const
 {

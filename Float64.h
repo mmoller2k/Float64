@@ -8,6 +8,7 @@
 extern "C" {
 #include "include/softfloat.h"
 #include "include/specialize.h"
+#include "include/internals.h"
 }
 #endif
 
@@ -119,11 +120,11 @@ public:
   // quick sign test
   bool isNegative (void) const;
   // quick zero test
-  bool isZero (void) const;
+  //bool isZero (void) const;
   // integer part
   int32_t ipart (void) const; //only for quick 32-bit conversion
-  int16_t epart (void) const;
-  int16_t epart (float64_t *) const;
+  //int16_t epart (void) const;
+  //int16_t epart (float64_t *) const;
   //float64_t s_f64(void);
   
   // other mathematical operations

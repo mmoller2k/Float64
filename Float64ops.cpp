@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Float64.h"
-#include "include/internals.h"
 
 #define obase 10
 
@@ -39,6 +38,7 @@ void f64::setDecs(uint8_t n)
   aft_point = n;
 }
 
+/*
 int16_t f64::epart(void) const
 {
   return epart(NULL);
@@ -48,6 +48,7 @@ int16_t f64::epart(float64_t *sig) const
 {
   return f64_epart(num_, sig,obase);
 }
+*/
 
 /* return base_x exponent and the significand */
 static int16_t f64_epart(float64_t z, float64_t *sig, int8_t base)
@@ -126,7 +127,7 @@ static int intToStr(i64 x, char str[], int8_t d, int8_t base)
     return i;
 }
 
-// return 10^n
+// return base^n
 i64 powbase(int n, int8_t base)
 {
   int i;
@@ -159,7 +160,7 @@ void f64::hi_bits(int32_t b)
 }
 */
 
-static float64_t bintof(uint64_t u)
+static float64_t bintof64(uint64_t u)
 {
   float64_t f;
   f.v = u;
@@ -168,10 +169,6 @@ static float64_t bintof(uint64_t u)
 
 #define expMax 12
 #define f64scale 10
-
-//#define small bintof(0x3cf6849b86a12b58) //smaller than display size: 5e-15
-#define ten bintof(0x4024000000000004) //10
-#define large bintof(0x4341c37937e08000) //1e0^16
 
 char * f64::toString(void) const
 {
@@ -276,7 +273,8 @@ bool f64::isNaN(void) const
 {
   //return f64_isSignalingNaN(num_);
   //return softfloat_isSigNaNF64UI(num_.v);
-  return isNaNF64UI(num_.v); //why doesn't the two above work?
+  //return isNaNF64UI(num_.v);
+  return fracF64UI(num_.v) && (expF64UI(num_.v)==0x7ff);
 }
 
 bool f64::isInf(void) const
@@ -289,15 +287,20 @@ bool f64::isNum(void) const
   return expF64UI(num_.v)!=0x7ff;
 }
 
+//#define ten bintof64(0x4024000000000004) //10
+#define ten i32_to_f64(10)
+#define large bintof64(0x4341c37937e08000) //1e0^16
+
 /* minimal strtod - no validation checking */
 f64 strtof64(const char *nptr, char **endptr)
 {
   f64 result;
   float64_t d = {0};
-  int16_t k,e=0;
+  int16_t e=0;
   int8_t i=0,npos=0;
   i64 nlog=10;
   char c=nptr[0];
+  int8_t k;
   bool stop = false;
   bool neg = false;
   int8_t nexp = 0;
@@ -305,20 +308,21 @@ f64 strtof64(const char *nptr, char **endptr)
 
   for(i=0;c&&!stop;i++){
     c=nptr[i];
+    k=c-'0';
     switch(c){
     case '0' ... '9':
       if(nexp){ /* exponent */
 	e *= 10;
-	e += c-'0';
+	e += k;
 	nexp++;
       }
       else if(npos>=0){ /* before the point */
 	d = f64_mul(d,ten);
-	d = f64_add(d,i32_to_f64(c-'0'));
+	d = f64_add(d,i32_to_f64(k));
 	npos++;
       }
       else{ /* after the point */
-	d = f64_add(d, f64_div(i32_to_f64(c-'0'),i64_to_f64(nlog)) );
+	d = f64_add(d, f64_div(i32_to_f64(k),i64_to_f64(nlog)) );
 	npos--;
 	nlog*=10;
       }
@@ -343,8 +347,6 @@ f64 strtof64(const char *nptr, char **endptr)
       break;
     }
   }
-
-  //d = f64_add(d, small); /* force rounding upward */
 
   if(sexp) while(e>=16){ d=f64_div(d,large); e-=16;}
   else while(e>=16){ d=f64_mul(d,large);e-=16;}
