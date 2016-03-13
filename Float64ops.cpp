@@ -3,8 +3,8 @@
 #include "Float64.h"
 
 char      f64::str_[F64_STRLEN];
-int8_t   f64::aft_point = 10;
-int8_t   f64::obase = 10; //belongs to class
+int   f64::aft_point = 10;
+int   f64::obase = 10; //belongs to class
 static int8_t ibase = 10; //belongs to ops
 
 /* more f64 operations */
@@ -33,12 +33,12 @@ f64 f64::intval(void) const
 }
 
 
-void f64::setDecs(int8_t n)
+void f64::setDecs(int n)
 {
   aft_point = n;
 }
 
-void f64::setBase(int8_t n)
+void f64::setBase(int n)
 {
   obase = ibase = n;
 }
@@ -173,11 +173,10 @@ static float64_t bintof64(uint64_t u)
 }
 
 #define expMax 12
-#define f64scale 10
 
 char * f64::toString(void) const
 {
-  return toString(f64scale);
+  return toString(aft_point);
 }
 
 char * f64::toString(int afterpoint) const
@@ -211,7 +210,7 @@ char * f64::toString(int afterpoint) const
 
   if(e>expMax || e<-expMax){
     v = sig;
-    afterpoint = f64scale;
+    afterpoint = aft_point;
     ep=e;
   }
 
