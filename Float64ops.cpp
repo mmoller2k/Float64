@@ -6,6 +6,7 @@ char      f64::str_[F64_STRLEN];
 int   f64::aft_point = 4;
 int   f64::expMax = 10;
 int   f64::obase = 10; //belongs to class
+bool  f64::eng_en = false;
 static int8_t ibase = 10; //belongs to ops
 
 /* more f64 operations */
@@ -38,9 +39,10 @@ void f64::setDecs(int n)
   aft_point = n;
 }
 
-void f64::setExpMax(int n)
+void f64::setExpMax(int n, bool eng)
 {
   expMax = n;
+  eng_en = eng;
 }
 
 void f64::setBase(int n)
@@ -190,7 +192,7 @@ char * f64::toString(int afterpoint) const
   float64_t small;
   int64_t pn, ipart, ip0;
   int i = 0;
-  int16_t e,ep=0;
+  int16_t e,ep=0,en=0;
 
   //if(f64_lt(v,i32_to_f64(0))){
   if(signF64UI(num_.v)){
@@ -217,6 +219,11 @@ char * f64::toString(int afterpoint) const
     v = sig;
     afterpoint = aft_point;
     ep=e;
+  }
+  if(eng_en){ //engineering notation
+    en = ep>=0 ? 1+ep%3 : 3+(ep+1)%3;
+    v = f64_mul(sig,i64_to_f64(powbase(en,obase)));
+    ep -= en;
   }
 
 

@@ -26,7 +26,8 @@ class f64 : public Printable
   static char      str_[];
   static int   aft_point;
   static int   obase;
-  static int expMax;
+  static int   expMax;
+  static bool  eng_en;
 
   void init(void);
 
@@ -62,7 +63,7 @@ public:
   //operator float32_t () const;
   operator float64_t () const;
   void setDecs(int n); /* set no of digits after the decimal point */
-  void setExpMax(int n); /* max size before switching to sci notation */
+  void setExpMax(int n, bool eng); /* max size before switching to sci notation */
   void setBase(int n); /* arbitrary base selection */
   virtual size_t printTo(Print& p) const; // for Serial.print()
 
