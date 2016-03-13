@@ -3,7 +3,8 @@
 #include "Float64.h"
 
 char      f64::str_[F64_STRLEN];
-int   f64::aft_point = 10;
+int   f64::aft_point = 4;
+int   f64::expMax = 10;
 int   f64::obase = 10; //belongs to class
 static int8_t ibase = 10; //belongs to ops
 
@@ -32,10 +33,14 @@ f64 f64::intval(void) const
   return f64_roundToInt( num_, softfloat_round_minMag, 0 );
 }
 
-
 void f64::setDecs(int n)
 {
   aft_point = n;
+}
+
+void f64::setExpMax(int n)
+{
+  expMax = n;
 }
 
 void f64::setBase(int n)
@@ -172,7 +177,7 @@ static float64_t bintof64(uint64_t u)
   return f;
 }
 
-#define expMax 12
+//#define expMax 12
 
 char * f64::toString(void) const
 {
