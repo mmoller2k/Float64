@@ -26,7 +26,6 @@ class f64 : public Printable
   static char      str_[];
   static int8_t   aft_point;
   static int8_t   obase;
-  //int8_t maxexp_;
 
   void init(void);
 

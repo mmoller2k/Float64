@@ -2,11 +2,10 @@
 #include <string.h>
 #include "Float64.h"
 
-//#define obase 10
-
-  char      f64::str_[F64_STRLEN];
-  int8_t   f64::aft_point = 10;
-  int8_t   f64::obase = 10;
+char      f64::str_[F64_STRLEN];
+int8_t   f64::aft_point = 10;
+int8_t   f64::obase = 10; //belongs to class
+static int8_t ibase = 10; //belongs to ops
 
 /* more f64 operations */
 
@@ -41,7 +40,7 @@ void f64::setDecs(int8_t n)
 
 void f64::setBase(int8_t n)
 {
-  obase = n;
+  obase = ibase = n;
 }
 
 /*
@@ -294,8 +293,8 @@ bool f64::isNum(void) const
 }
 
 //#define ten bintof64(0x4024000000000004) //10
-#define ten i32_to_f64(10)
-#define large bintof64(0x4341c37937e08000) //1e0^16
+//#define ten i32_to_f64(10)
+//#define large bintof64(0x4341c37937e08000) //1e0^16
 
 /* minimal strtod - no validation checking */
 f64 strtof64(const char *nptr, char **endptr)
@@ -311,26 +310,28 @@ f64 strtof64(const char *nptr, char **endptr)
   bool neg = false;
   int8_t nexp = 0;
   bool sexp = false;
+  float64_t large;
 
   for(i=0;c&&!stop;i++){
     c=nptr[i];
-    k=c-'0';
+    k=c<'a'?c-'0':c-'a'+10;
     switch(c){
+    case 'a' ... 'f': //accept hex as well
     case '0' ... '9':
       if(nexp){ /* exponent */
-	e *= 10;
+	e *= ibase;
 	e += k;
 	nexp++;
       }
       else if(npos>=0){ /* before the point */
-	d = f64_mul(d,ten);
+	d = f64_mul(d,i32_to_f64(ibase));
 	d = f64_add(d,i32_to_f64(k));
 	npos++;
       }
       else{ /* after the point */
 	d = f64_add(d, f64_div(i32_to_f64(k),i64_to_f64(nlog)) );
 	npos--;
-	nlog*=10;
+	nlog*=ibase;
       }
       break;
     case '.':
@@ -342,7 +343,7 @@ f64 strtof64(const char *nptr, char **endptr)
       if(nexp)sexp=true;
       else neg=true;
       break;
-    case 'e':
+    case 'E':
       nexp=1;
       break;
     case '_': /* placeholders that does nothing */
@@ -354,11 +355,16 @@ f64 strtof64(const char *nptr, char **endptr)
     }
   }
 
-  if(sexp) while(e>=16){ d=f64_div(d,large); e-=16;}
-  else while(e>=16){ d=f64_mul(d,large);e-=16;}
-
-  if(sexp) while(e--) d=f64_div(d,ten);
-  else while(e--) d=f64_mul(d,ten);
+  large=i64_to_f64(powbase(15,ibase)); //can't go to 16 in hex mode
+  large=f64_mul(large,i32_to_f64(ibase)); //large=ibase^16
+  if(sexp){ // multiply exponent in
+    while(e>=16){ d=f64_div(d,large); e-=16;}
+    while(e--) d=f64_div(d,i32_to_f64(ibase));
+  }
+  else{
+    while(e>=16){ d=f64_mul(d,large);e-=16;}
+    while(e--) d=f64_mul(d,i32_to_f64(ibase));
+  }
 
   if(endptr)*endptr += i;
   if(!neg)result = d;
