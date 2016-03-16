@@ -141,10 +141,12 @@ f64::operator int () const
   return f64_to_i32(num_, softfloat_round_max, 0);
 } // end of f64::operator int
 
+#if defined(ARDUINO)
 f64::operator long () const
 {
   return f64_to_i32(num_, softfloat_round_max, 0);
 } // end of f64::operator long
+#endif
 
 /*
 f64::operator double () const
