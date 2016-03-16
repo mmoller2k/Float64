@@ -163,6 +163,11 @@ f64::operator float64_t () const
   return num_;
 } // end of f64::operator long
 
+f64::operator int64_t () const
+{
+  return f64_to_i64(num_, softfloat_round_max, 0);
+} // end of f64::operator long
+
 // add
 f64 & f64::operator+= (const f64 & n)
 { 
@@ -246,16 +251,17 @@ bool f64::isNegative () const
   return signF64UI(num_.v);
 } // end of f64::isNegative
 
-/*
+
 bool f64::isZero () const
 {
-  return f64_eq(num_,i32_to_f64(0));
+  return !num_.v;
+  //return f64_eq(num_,i32_to_f64(0));
 } // end of f64::isZero
-*/
 
-int32_t f64::ipart() const
+
+int64_t f64::ipart() const
 {
-  return f64_to_i32(num_,softfloat_round_minMag, 0);
+  return f64_to_i64(num_,softfloat_round_minMag, 0);
 }
 
 

@@ -77,6 +77,7 @@ static int16_t f64_epart(float64_t z, float64_t *sig, int8_t base)
   if(e==0x7ff)return 0; //z==inf?
 
   //limit range
+  softfloat_exceptionFlags=0;
   if(e<1023){
     while((e=expF64UI(z.v))<1023){ // multiply number bigger 
       if(softfloat_exceptionFlags>1)return 0;
@@ -225,7 +226,6 @@ char * f64::toString(int afterpoint) const
     v = f64_mul(sig,i64_to_f64(powbase(en,obase)));
     ep -= en;
   }
-
 
   small=f64_div( i32_to_f64(obase/2),i64_to_f64(powbase(afterpoint+1,obase)) );    
   v = f64_add(v, small); /* force rounding upward */

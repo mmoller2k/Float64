@@ -62,6 +62,7 @@ public:
   //operator double () const;
   //operator float32_t () const;
   operator float64_t () const;
+  operator int64_t () const;
   void setDecs(int n); /* set no of digits after the decimal point */
   void setExpMax(int n, bool eng); /* max size before switching to sci notation */
   void setBase(int n); /* arbitrary base selection */
@@ -124,9 +125,9 @@ public:
   // quick sign test
   bool isNegative (void) const;
   // quick zero test
-  //bool isZero (void) const;
+  bool isZero (void) const;
   // integer part
-  int32_t ipart (void) const; //only for quick 32-bit conversion
+  int64_t ipart (void) const; //only for quick 64-bit conversion
   //int16_t epart (void) const;
   //int16_t epart (float64_t *) const;
   //float64_t s_f64(void);
