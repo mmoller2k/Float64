@@ -71,8 +71,8 @@ static int16_t f64_epart(float64_t z, float64_t *sig, int8_t base)
 
   //const float64_t one = i32_to_f64(1);
   const float64_t bn = i32_to_f64(base);
-  const float64_t big = i64_to_f64(powbase(16,base));
-  //big = f64_mul(big,i64_to_f64(100000000)); //bigger
+  float64_t big = i64_to_f64(powbase(8,base)); //32-bit (base^8)
+  big = f64_mul(big,big); //bigger than 64-bit (base^16)
   if(e==0)return 0;
   if(e==0x7ff)return 0; //z==inf?
 
@@ -325,7 +325,7 @@ f64 strtof64(const char *nptr, char **endptr)
 
   for(i=0;c&&!stop;i++){
     c=nptr[i];
-    k=c<'a'?c-'0':c-'a'+10;
+    k=c<'A'?c-'0':c-'A'+10;
     switch(c){
     case 'A' ... 'F': //accept hex as well
     case '0' ... '9':
