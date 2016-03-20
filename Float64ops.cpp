@@ -261,7 +261,7 @@ char * f64::toString(int afterpoint) const
   }
 
   if(ep){
-    str_[i++]='e';
+    str_[i++]=EXPCHAR;
     if(ep<0){
       str_[i++]='-';
       ep=-ep;
@@ -327,7 +327,7 @@ f64 strtof64(const char *nptr, char **endptr)
     c=nptr[i];
     k=c<'a'?c-'0':c-'a'+10;
     switch(c){
-    case 'a' ... 'f': //accept hex as well
+    case 'A' ... 'F': //accept hex as well
     case '0' ... '9':
       if(nexp){ /* exponent */
 	e *= ibase;
@@ -354,7 +354,7 @@ f64 strtof64(const char *nptr, char **endptr)
       if(nexp)sexp=true;
       else neg=true;
       break;
-    case 'E':
+    case EXPCHAR:
       nexp=1;
       break;
     case '_': /* placeholders that does nothing */

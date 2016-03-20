@@ -12,6 +12,13 @@ extern "C" {
 }
 #endif
 
+//sci notation exp char
+#if defined(ARDUINO)
+#define EXPCHAR 7
+#else
+#define EXPCHAR 'e'
+#endif
+
 //typedef float64_t f64;
 typedef float32_t f32;
 typedef uint64_t ui64;
