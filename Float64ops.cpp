@@ -216,7 +216,7 @@ char * f64::toString(int afterpoint) const
   }
   e=f64_epart(v,&sig,obase);
 
-  if(e>expMax || e<-expMax){
+  if(e>expMax || e<-aft_point){
     v = sig;
     afterpoint = aft_point;
     ep=e;
