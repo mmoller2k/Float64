@@ -316,7 +316,7 @@ f64 strtof64(const char *nptr, char **endptr)
   float64_t d = {0};
   int16_t e=0;
   int8_t i=0,npos=0;
-  i64 nlog=10;
+  i64 nlog=ibase;
   char c=nptr[0];
   int8_t k;
   bool stop = false;
