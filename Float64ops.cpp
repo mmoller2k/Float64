@@ -4,7 +4,7 @@
 
 char      f64::str_[F64_STRLEN];
 int   f64::aft_point = 4;
-int   f64::expMax = 10;
+int   f64::expMax = 14;
 int   f64::obase = 10; //belongs to class
 bool  f64::eng_en = false;
 static int8_t ibase = 10; //belongs to ops
@@ -216,15 +216,17 @@ char * f64::toString(int afterpoint) const
   }
   e=f64_epart(v,&sig,obase);
 
-  if(e>expMax || e<-expMax || e<-aft_point){
+  if((e>expMax) || (e<-aft_point) || (e<-expMax)){ //scientific notation
     v = sig;
     afterpoint = aft_point;
+    if(aft_point>8)afterpoint=8;
     ep=e;
   }
   if(eng_en){ //engineering notation
-    en = ep>=0 ? 1+ep%3 : 3+(ep+1)%3;
+    en = ep>=0 ? ep%3 : 2+(ep+1)%3;
     v = f64_mul(sig,i64_to_f64(powbase(en,obase)));
     ep -= en;
+    if(aft_point>8-en)afterpoint=8-en;
   }
 
   printf(" e:%d, ep:%d, en:%d\n",e, ep, en);
@@ -238,14 +240,14 @@ char * f64::toString(int afterpoint) const
   // Extract floating part
   fpart = f64_sub(v, i64_to_f64(ipart));
 
-  if(ep && ipart>9){ /* fix rounding errors */
-    ipart /= 10;
-    ep++;
-  }
+  //if(ep && ipart>9){ /* fix rounding errors */
+  //  ipart /= 10;
+  //  ep++;
+  //}
  
   // convert integer part to string
   i += intToStr(ipart, str_+i, 1,obase);
- 
+
   // check for display option after point
   if (afterpoint != 0){
     str_[i++] = '.';  // add dot
@@ -257,7 +259,7 @@ char * f64::toString(int afterpoint) const
     // to handle cases like 233.007
     pn = powbase(afterpoint,obase);
     fpart = f64_mul( fpart, i64_to_f64(pn) );
- 
+
     i += intToStr(f64_to_i64(fpart, softfloat_round_min, 0), str_ + i, afterpoint,obase);
   }
 
@@ -315,7 +317,7 @@ f64 strtof64(const char *nptr, char **endptr)
   float64_t d = {0};
   int16_t e=0;
   int8_t i=0,npos=0;
-  i64 nlog=10;
+  i64 nlog=ibase;
   char c=nptr[0];
   int8_t k;
   bool stop = false;
