@@ -216,7 +216,7 @@ char * f64::toString(int afterpoint) const
   }
   e=f64_epart(v,&sig,obase);
 
-  if(e>expMax || e<-aft_point){
+  if(e>expMax || e<-expMax || e<-aft_point){
     v = sig;
     afterpoint = aft_point;
     ep=e;
@@ -227,6 +227,7 @@ char * f64::toString(int afterpoint) const
     ep -= en;
   }
 
+  printf(" e:%d, ep:%d, en:%d\n",e, ep, en);
   small=f64_div( i32_to_f64(obase/2),i64_to_f64(powbase(afterpoint+1,obase)) );    
   v = f64_add(v, small); /* force rounding upward */
   /* (make .99999999999999 = 1.0) */
